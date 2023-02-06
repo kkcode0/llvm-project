@@ -24,7 +24,7 @@ public:
                         lldb::addr_t reg_data_addr);
 
   ~RegisterContextMemory() override;
-
+ uint64_t GetThreadPointer() override {return -1;}
   void InvalidateAllRegisters() override;
 
   size_t GetRegisterCount() override;

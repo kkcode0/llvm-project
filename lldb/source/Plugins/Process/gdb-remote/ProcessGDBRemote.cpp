@@ -1032,7 +1032,7 @@ void ProcessGDBRemote::MaybeLoadExecutableModule() {
   if (!module_sp)
     return;
 
-  llvm::Optional<QOffsets> offsets = m_gdb_comm.GetQOffsets();
+ llvm::Optional<QOffsets> offsets = m_gdb_comm.GetQOffsets();
   if (!offsets)
     return;
 
@@ -1496,7 +1496,9 @@ bool ProcessGDBRemote::DoUpdateThreadList(ThreadList &old_thread_list,
       return false;
     num_thread_ids = m_thread_ids.size();
   }
-
+  for(auto& tid: m_thread_ids) {
+   auto tls_info = m_gdb_comm.GetQGetTLSAddr(tid, 0, 0);
+  }
   ThreadList old_thread_list_copy(old_thread_list);
   if (num_thread_ids > 0) {
     for (size_t i = 0; i < num_thread_ids; ++i) {
@@ -1527,7 +1529,7 @@ bool ProcessGDBRemote::DoUpdateThreadList(ThreadList &old_thread_list,
       m_thread_id_to_index_id_map.erase(old_thread_id);
     }
   }
-
+  
   return true;
 }
 
@@ -4381,7 +4383,7 @@ llvm::Expected<LoadedModuleInfoList> ProcessGDBRemote::GetLoadedModuleList() {
       llvm::to_integer(main_lm, list.m_link_map);
 
     root_element.ForEachChildElementWithName(
-        "library", [log, &list](const XMLNode &library) -> bool {
+        "library", [log, &list,&main_lm](const XMLNode &library) -> bool {
           LoadedModuleInfoList::LoadedModuleInfo module;
 
           // FIXME: we're silently ignoring invalid data here
@@ -4424,8 +4426,8 @@ llvm::Expected<LoadedModuleInfoList> ProcessGDBRemote::GetLoadedModuleList() {
             module.get_dynamic(ld);
 
             LLDB_LOGF(log,
-                      "found (link_map:0x%08" PRIx64 ", base:0x%08" PRIx64
-                      "[%s], ld:0x%08" PRIx64 ", name:'%s')",
+                      "found (main-lm:'%s', link_map:0x%08" PRIx64 ", base:0x%08" PRIx64
+                      "[%s], ld:0x%08" PRIx64 ", name:'%s')",main_lm.c_str(),
                       lm, base, (base_is_offset ? "offset" : "absolute"), ld,
                       name.c_str());
           }

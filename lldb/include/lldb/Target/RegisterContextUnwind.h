@@ -41,7 +41,7 @@ public:
   const lldb_private::RegisterInfo *GetRegisterInfoAtIndex(size_t reg) override;
 
   size_t GetRegisterSetCount() override;
-
+  uint64_t GetThreadPointer() override {return -1;} 
   const lldb_private::RegisterSet *GetRegisterSet(size_t reg_set) override;
 
   bool ReadRegister(const lldb_private::RegisterInfo *reg_info,

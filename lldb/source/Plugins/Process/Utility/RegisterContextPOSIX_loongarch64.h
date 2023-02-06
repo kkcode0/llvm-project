@@ -24,7 +24,7 @@ public:
   ~RegisterContextPOSIX_loongarch64() override;
 
   void invalidate();
-
+uint64_t GetThreadPointer() override {return -1;}
   void InvalidateAllRegisters() override;
 
   size_t GetRegisterCount() override;

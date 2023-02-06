@@ -110,6 +110,18 @@ Status NativeRegisterContextLinux::ReadFPR() {
                                            GetFPRSize());
 }
 
+Status NativeRegisterContextLinux::ReadThreadPointer(uint64_t& tp) {
+    // return NativeProcessLinux::PtraceWrapper(PTRACE_GET_THREAD_AREA, m_thread.GetID(),
+    //                                        &tp, (void *)ARCH_GET_FS, 0);
+                                              Status error;
+  errno = 0;
+
+  auto ret= ptrace(static_cast<__ptrace_request>(PTRACE_ARCH_PRCTL), m_thread.GetID(), &tp, (void *)ARCH_GET_FS, 0);
+
+  if (ret == -1)
+    error.SetErrorToErrno();
+    return error;
+}
 Status NativeRegisterContextLinux::WriteFPR() {
   return NativeProcessLinux::PtraceWrapper(PTRACE_SETFPREGS, m_thread.GetID(),
                                            nullptr, GetFPRBuffer(),

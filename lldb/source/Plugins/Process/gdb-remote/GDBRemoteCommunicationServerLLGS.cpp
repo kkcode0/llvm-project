@@ -150,6 +150,9 @@ void GDBRemoteCommunicationServerLLGS::RegisterPacketHandlers() {
       StringExtractorGDBRemote::eServerPacketType_qsThreadInfo,
       &GDBRemoteCommunicationServerLLGS::Handle_qsThreadInfo);
   RegisterMemberFunctionHandler(
+      StringExtractorGDBRemote::eServerPacketType_qGetTLSAddr,
+      &GDBRemoteCommunicationServerLLGS::Handle_qGetTLSAddr);
+  RegisterMemberFunctionHandler(
       StringExtractorGDBRemote::eServerPacketType_qThreadStopInfo,
       &GDBRemoteCommunicationServerLLGS::Handle_qThreadStopInfo);
   RegisterMemberFunctionHandler(
@@ -2111,9 +2114,48 @@ GDBRemoteCommunicationServerLLGS::Handle_qsThreadInfo(
 }
 
 GDBRemoteCommunication::PacketResult
+GDBRemoteCommunicationServerLLGS::Handle_qGetTLSAddr(
+    StringExtractorGDBRemote &packet) {
+  Log *log = GetLog(LLDBLog::Process | LLDBLog::Thread);
+         LLDB_LOG(log,"fooKamlesh0");
+
+  llvm::StringRef s = packet.GetStringRef();
+  if (!s.consume_front("qGetTLSAddr:"))
+    return SendErrorResponse(8);
+
+  llvm::SmallVector<llvm::StringRef, 16> argv;
+  s.split(argv, ',');
+  for (llvm::StringRef hex_arg : argv) {
+    LLDB_LOG(log, "LLGSPacketHandler::%s added arg: \"%s\"", __FUNCTION__,
+              hex_arg.str().c_str());
+  }
+  lldb::tid_t tid =  StringExtractor(argv[0]).GetU64(0, 16);
+NativeThreadProtocol* ntp= m_current_process->GetThreadByID(tid);
+NativeRegisterContext &reg_ctx = ntp->GetRegisterContext();
+lldb::addr_t tls_addr=-1;
+
+  if(!reg_ctx.ReadThreadPointer(tls_addr).Fail())
+{
+
+// std::vector<uint8_t> buffer;
+// memcpy(buffer.data(), (void*)&tls_addr, sizeof(tls_addr));
+//   std::string tls_addr_str;
+//   StringExtractor(std::to_string(tls_addr)).GetHexByteString(tls_addr_str);
+//   // FIXME for now we return the full thread list in the initial packet and
+//   // always do nothing here.
+  StreamGDBRemote response;
+  //response.PutBytesAsRawHex8(tls_addr_str.data(), tls_addr_str.size());
+    response.PutHex64(tls_addr, lldb::eByteOrderBig);
+  return SendPacketNoLock(response.GetString());
+}
+  else
+    return SendErrorResponse(8);
+
+}
+
+GDBRemoteCommunication::PacketResult
 GDBRemoteCommunicationServerLLGS::Handle_g(StringExtractorGDBRemote &packet) {
   Log *log = GetLog(LLDBLog::Thread);
-
   // Move past packet name.
   packet.SetFilePos(strlen("g"));
 
@@ -2123,10 +2165,8 @@ GDBRemoteCommunicationServerLLGS::Handle_g(StringExtractorGDBRemote &packet) {
     LLDB_LOG(log, "failed, no thread available");
     return SendErrorResponse(0x15);
   }
-
   // Get the thread's register context.
   NativeRegisterContext &reg_ctx = thread->GetRegisterContext();
-
   std::vector<uint8_t> regs_buffer;
   for (uint32_t reg_num = 0; reg_num < reg_ctx.GetUserRegisterCount();
        ++reg_num) {
@@ -2147,7 +2187,6 @@ GDBRemoteCommunicationServerLLGS::Handle_g(StringExtractorGDBRemote &packet) {
       LLDB_LOG(log, "failed to read register at index {0}", reg_num);
       return SendErrorResponse(0x15);
     }
-
     if (reg_info->byte_offset + reg_info->byte_size >= regs_buffer.size())
       // Resize the buffer to guarantee it can store the register offsetted
       // data.
@@ -3161,7 +3200,7 @@ GDBRemoteCommunicationServerLLGS::BuildTargetXml() {
 llvm::Expected<std::unique_ptr<llvm::MemoryBuffer>>
 GDBRemoteCommunicationServerLLGS::ReadXferObject(llvm::StringRef object,
                                                  llvm::StringRef annex) {
-  // Make sure we have a valid process.
+	// Make sure we have a valid process.
   if (!m_current_process ||
       (m_current_process->GetID() == LLDB_INVALID_PROCESS_ID)) {
     return llvm::createStringError(llvm::inconvertibleErrorCode(),
@@ -3208,7 +3247,7 @@ GDBRemoteCommunicationServerLLGS::ReadXferObject(llvm::StringRef object,
 
   if (object == "features" && annex == "target.xml")
     return BuildTargetXml();
-
+    
   return llvm::make_error<UnimplementedError>();
 }
 

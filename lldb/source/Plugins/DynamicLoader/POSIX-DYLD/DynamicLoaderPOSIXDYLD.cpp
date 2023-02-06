@@ -188,7 +188,7 @@ void DynamicLoaderPOSIXDYLD::DidLaunch() {
       // at entry point.
       ProbeEntry();
     }
-
+    LoadAllCurrentModules();
     LoadVDSO();
     m_process->GetTarget().ModulesDidLoad(module_list);
   }
@@ -200,6 +200,9 @@ void DynamicLoaderPOSIXDYLD::UpdateLoadedSections(ModuleSP module,
                                                   addr_t link_map_addr,
                                                   addr_t base_addr,
                                                   bool base_addr_is_offset) {
+  Log *log = GetLog(LLDBLog::DynamicLoader);
+
+  LLDB_LOGF(log, "DYLD::UpdateLoadedSections link_map_addr:%" PRIx64,  link_map_addr);                 
   m_loaded_modules[module] = link_map_addr;
   UpdateLoadedSectionsCommon(module, base_addr, base_addr_is_offset);
 }
@@ -734,9 +737,9 @@ DynamicLoaderPOSIXDYLD::GetThreadLocalData(const lldb::ModuleSP module_sp,
   if (it == m_loaded_modules.end())
     return LLDB_INVALID_ADDRESS;
 
-  addr_t link_map = it->second;
-  if (link_map == LLDB_INVALID_ADDRESS)
-    return LLDB_INVALID_ADDRESS;
+   addr_t link_map = it->second;
+  // if (link_map == LLDB_INVALID_ADDRESS)
+  //   return LLDB_INVALID_ADDRESS;
 
   const DYLDRendezvous::ThreadInfo &metadata = m_rendezvous.GetThreadInfo();
   if (!metadata.valid)
@@ -751,6 +754,7 @@ DynamicLoaderPOSIXDYLD::GetThreadLocalData(const lldb::ModuleSP module_sp,
   int modid_size = 4; // FIXME(spucci): This isn't right for big-endian 64-bit
   int64_t modid = ReadUnsignedIntWithSizeInBytes(
       link_map + metadata.modid_offset, modid_size);
+  modid=1;
   if (modid == -1)
     return LLDB_INVALID_ADDRESS;
 

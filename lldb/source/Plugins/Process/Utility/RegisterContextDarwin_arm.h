@@ -53,7 +53,7 @@ public:
   void InvalidateAllRegisters() override;
 
   size_t GetRegisterCount() override;
-
+uint64_t GetThreadPointer() override {return -1;}
   const lldb_private::RegisterInfo *GetRegisterInfoAtIndex(size_t reg) override;
 
   size_t GetRegisterSetCount() override;

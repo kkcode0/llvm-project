@@ -37,7 +37,7 @@ public:
   void InvalidateAllRegisters() override {
     // Do nothing... registers are always valid...
   }
-
+uint64_t GetThreadPointer() override {return -1;}
   // Used for unit testing.
   static size_t GetRegisterCountStatic();
   // Used for unit testing.

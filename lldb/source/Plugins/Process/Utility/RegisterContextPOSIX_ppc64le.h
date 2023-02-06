@@ -24,7 +24,7 @@ public:
   void InvalidateAllRegisters() override;
 
   size_t GetRegisterCount() override;
-
+uint64_t GetThreadPointer() override {return -1;}
   virtual size_t GetGPRSize();
 
   virtual unsigned GetRegisterSize(unsigned reg);

@@ -2498,7 +2498,6 @@ bool DWARFExpression::Evaluate(
           error_ptr->SetErrorString("No thread to evaluate TLS within.");
         return false;
       }
-
       // Lookup the TLS block address for this thread and module.
       const addr_t tls_file_addr =
           stack.back().GetScalar().ULongLong(LLDB_INVALID_ADDRESS);

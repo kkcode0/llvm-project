@@ -209,6 +209,8 @@ StringExtractorGDBRemote::GetServerPacketType() const {
         return eServerPacketType_qGetProfileData;
       if (PACKET_MATCHES("qGDBServerVersion"))
         return eServerPacketType_qGDBServerVersion;
+      if (PACKET_STARTS_WITH("qGetTLSAddr"))
+	      return eServerPacketType_qGetTLSAddr;
       break;
 
     case 'H':

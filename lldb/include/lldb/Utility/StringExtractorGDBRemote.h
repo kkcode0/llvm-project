@@ -108,6 +108,7 @@ public:
     eServerPacketType_jThreadsInfo,
     eServerPacketType_qsThreadInfo,
     eServerPacketType_qfThreadInfo,
+    eServerPacketType_qGetTLSAddr,
     eServerPacketType_qGetPid,
     eServerPacketType_qGetProfileData,
     eServerPacketType_qGDBServerVersion,

@@ -80,6 +80,21 @@ const RegisterSet *GDBRemoteRegisterContext::GetRegisterSet(size_t reg_set) {
   return m_reg_info_sp->GetRegisterSet(reg_set);
 }
 
+uint64_t GDBRemoteRegisterContext::GetThreadPointer() {
+  ExecutionContext exe_ctx(CalculateThread());
+
+  Process *process = exe_ctx.GetProcessPtr();
+  Thread *thread = exe_ctx.GetThreadPtr();
+  if (process == nullptr || thread == nullptr)
+    return -1;
+
+  GDBRemoteCommunicationClient &gdb_comm(
+      ((ProcessGDBRemote *)process)->GetGDBRemote());
+  uint64_t tp = -1;
+  uint64_t tid = thread->GetProtocolID();
+  return gdb_comm.GetQGetTLSAddr(tid);
+}
+
 bool GDBRemoteRegisterContext::ReadRegister(const RegisterInfo *reg_info,
                                             RegisterValue &value) {
   // Read the register

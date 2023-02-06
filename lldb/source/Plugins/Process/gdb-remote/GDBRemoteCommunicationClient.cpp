@@ -349,7 +349,7 @@ void GDBRemoteCommunicationClient::GetRemoteQSupported() {
   // build the qSupported packet
   std::vector<std::string> features = {"xmlRegisters=i386,arm,mips,arc",
                                        "multiprocess+", "fork-events+",
-                                       "vfork-events+"};
+                                       "vfork-events+", "qXfer:libraries-svr4:read+"};
   StreamString packet;
   packet.PutCString("qSupported");
   for (uint32_t i = 0; i < features.size(); ++i) {
@@ -3757,6 +3757,38 @@ llvm::Optional<QOffsets> GDBRemoteCommunicationClient::GetQOffsets() {
       return result;
   }
   return std::nullopt;
+}
+
+std::unordered_map<lldb::tid_t, lldb::addr_t> tid_to_tp;
+lldb::addr_t GDBRemoteCommunicationClient::GetQGetTLSAddr(lldb::tid_t tid) {
+  if (tid_to_tp.count(tid))
+    return tid_to_tp[tid];
+  return -1;
+}
+
+bool GDBRemoteCommunicationClient::GetQGetTLSAddr(lldb::tid_t tid, lldb::addr_t offset, lldb::addr_t lm) {
+  StreamString packet;
+  packet.PutCString("qGetTLSAddr:");
+  packet.PutHex64(tid, lldb::eByteOrderBig);
+  packet.PutCString(",");
+  packet.PutHex64(offset, lldb::eByteOrderBig);
+  packet.PutCString(",");
+  packet.PutHex64(lm, lldb::eByteOrderBig);
+  StringExtractorGDBRemote response;
+  if (SendPacketAndWaitForResponse(packet.GetString(), response) !=
+      PacketResult::Success)
+    return false;
+  if (response.IsErrorResponse())
+    return false;
+  if (response.IsUnsupportedResponse())
+    return false;
+   llvm::StringRef ref = response.GetStringRef();
+   uint64_t addr=-1;
+   ref.consumeInteger(16, addr);
+    Log *log(GetLog(GDBRLog::Process | GDBRLog::Packets));
+    LLDB_LOG(log, "here is tls addrkamlesh:%s",ref.str().c_str());
+   tid_to_tp[tid] = addr;// std::stoull(ref.str());
+  return true;
 }
 
 bool GDBRemoteCommunicationClient::GetModuleInfo(
