@@ -146,7 +146,7 @@ public:
   void Invalidate();
 
   void InvalidateAllRegisters() override;
-uint64_t GetThreadPointer() override {return -1;}
+
   size_t GetRegisterCount() override;
 
   virtual size_t GetGPRSize();

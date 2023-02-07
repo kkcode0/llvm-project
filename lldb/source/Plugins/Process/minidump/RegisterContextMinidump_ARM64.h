@@ -36,7 +36,7 @@ public:
   void InvalidateAllRegisters() override {
     // Do nothing... registers are always valid...
   }
-uint64_t GetThreadPointer() override {return -1;}
+
   size_t GetRegisterCount() override;
 
   const lldb_private::RegisterInfo *GetRegisterInfoAtIndex(size_t reg) override;

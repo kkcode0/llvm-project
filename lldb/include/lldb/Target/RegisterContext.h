@@ -36,7 +36,7 @@ public:
   virtual const RegisterSet *GetRegisterSet(size_t reg_set) = 0;
 
   virtual lldb::ByteOrder GetByteOrder();
-  virtual uint64_t GetThreadPointer() = 0;
+  virtual uint64_t GetThreadPointer();
   virtual bool ReadRegister(const RegisterInfo *reg_info,
                             RegisterValue &reg_value) = 0;
 

@@ -34,7 +34,7 @@ public:
   const RegisterSet *GetRegisterSet(uint32_t set_index) const override;
 
   uint32_t GetUserRegisterCount() const override;
-
+ Status ReadThreadPointer(uint64_t&tp) override;
   Status ReadRegister(const RegisterInfo *reg_info,
                       RegisterValue &reg_value) override;
 

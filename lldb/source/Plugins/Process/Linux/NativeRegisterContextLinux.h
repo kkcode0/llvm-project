@@ -80,7 +80,8 @@ public:
         llvm::inconvertibleErrorCode(),
         "Architecture does not support memory tagging");
   }
- Status ReadThreadPointer(uint64_t& tp) override;
+
+  virtual Status ReadThreadPointer(uint64_t& tp) override;
 
 protected:
   // NB: This constructor is here only because gcc<=6.5 requires a virtual base

@@ -32,7 +32,7 @@ public:
   size_t GetRegisterSetCount() override;
 
   const RegisterSet *GetRegisterSet(size_t reg_set) override;
-	uint64_t GetThreadPointer() override {return -1;}
+
   bool ReadRegister(const RegisterInfo *reg_info,
                     RegisterValue &reg_value) override;
 

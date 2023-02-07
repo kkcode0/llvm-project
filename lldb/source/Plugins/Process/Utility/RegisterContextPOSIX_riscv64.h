@@ -23,8 +23,8 @@ public:
 
   ~RegisterContextPOSIX_riscv64() override;
 
-uint64_t GetThreadPointer() override {return -1;}
-void invalidate();
+  
+  void invalidate();
 
   void InvalidateAllRegisters() override;
 

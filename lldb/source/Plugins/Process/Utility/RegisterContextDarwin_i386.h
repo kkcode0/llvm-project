@@ -18,7 +18,7 @@ public:
                              uint32_t concrete_frame_idx);
 
   ~RegisterContextDarwin_i386() override;
-uint64_t GetThreadPointer() override {return -1;}
+
   void InvalidateAllRegisters() override;
 
   size_t GetRegisterCount() override;

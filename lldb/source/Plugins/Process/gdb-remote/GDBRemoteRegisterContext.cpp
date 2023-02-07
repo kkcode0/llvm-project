@@ -82,15 +82,12 @@ const RegisterSet *GDBRemoteRegisterContext::GetRegisterSet(size_t reg_set) {
 
 uint64_t GDBRemoteRegisterContext::GetThreadPointer() {
   ExecutionContext exe_ctx(CalculateThread());
-
   Process *process = exe_ctx.GetProcessPtr();
   Thread *thread = exe_ctx.GetThreadPtr();
   if (process == nullptr || thread == nullptr)
     return -1;
-
   GDBRemoteCommunicationClient &gdb_comm(
       ((ProcessGDBRemote *)process)->GetGDBRemote());
-  uint64_t tp = -1;
   uint64_t tid = thread->GetProtocolID();
   return gdb_comm.GetQGetTLSAddr(tid);
 }
