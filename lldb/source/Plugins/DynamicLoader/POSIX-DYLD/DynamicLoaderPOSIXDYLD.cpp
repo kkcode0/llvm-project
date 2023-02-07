@@ -733,44 +733,44 @@ DynamicLoaderPOSIXDYLD::GetThreadLocalData(const lldb::ModuleSP module_sp,
    if (link_map == LLDB_INVALID_ADDRESS)
      return LLDB_INVALID_ADDRESS;
 
-  const DYLDRendezvous::ThreadInfo &metadata = m_rendezvous.GetThreadInfo();
-  if (!metadata.valid)
-    return LLDB_INVALID_ADDRESS;
+   const DYLDRendezvous::ThreadInfo &metadata = m_rendezvous.GetThreadInfo();
+   if (!metadata.valid)
+     return LLDB_INVALID_ADDRESS;
 
-  // Get the thread pointer.
-  addr_t tp = thread->GetThreadPointer();
-  if (tp == LLDB_INVALID_ADDRESS)
-    return LLDB_INVALID_ADDRESS;
+   // Get the thread pointer.
+   addr_t tp = thread->GetThreadPointer();
+   if (tp == LLDB_INVALID_ADDRESS)
+     return LLDB_INVALID_ADDRESS;
 
-  // Find the module's modid.
-  int modid_size = 4; // FIXME(spucci): This isn't right for big-endian 64-bit
-  int64_t modid = ReadUnsignedIntWithSizeInBytes(
-      link_map + metadata.modid_offset, modid_size);
-  if (modid == -1)
-    return LLDB_INVALID_ADDRESS;
+   // Find the module's modid.
+   int modid_size = 4; // FIXME(spucci): This isn't right for big-endian 64-bit
+   int64_t modid = ReadUnsignedIntWithSizeInBytes(
+       link_map + metadata.modid_offset, modid_size);
+   if (modid == -1)
+     return LLDB_INVALID_ADDRESS;
 
-  // Lookup the DTV structure for this thread.
-  addr_t dtv_ptr = tp + metadata.dtv_offset;
-  addr_t dtv = ReadPointer(dtv_ptr);
-  if (dtv == LLDB_INVALID_ADDRESS)
-    return LLDB_INVALID_ADDRESS;
+   // Lookup the DTV structure for this thread.
+   addr_t dtv_ptr = tp + metadata.dtv_offset;
+   addr_t dtv = ReadPointer(dtv_ptr);
+   if (dtv == LLDB_INVALID_ADDRESS)
+     return LLDB_INVALID_ADDRESS;
 
-  // Find the TLS block for this module.
-  addr_t dtv_slot = dtv + metadata.dtv_slot_size * modid;
-  addr_t tls_block = ReadPointer(dtv_slot + metadata.tls_offset);
+   // Find the TLS block for this module.
+   addr_t dtv_slot = dtv + metadata.dtv_slot_size * modid;
+   addr_t tls_block = ReadPointer(dtv_slot + metadata.tls_offset);
 
-  Log *log = GetLog(LLDBLog::DynamicLoader);
-  LLDB_LOGF(log,
-            "DynamicLoaderPOSIXDYLD::Performed TLS lookup: "
-            "module=%s, link_map=0x%" PRIx64 ", tp=0x%" PRIx64
-            ", modid=%" PRId64 ", tls_block=0x%" PRIx64 "\n",
-            module_sp->GetObjectName().AsCString(""), link_map, tp,
-            (int64_t)modid, tls_block);
+   Log *log = GetLog(LLDBLog::DynamicLoader);
+   LLDB_LOGF(log,
+             "DynamicLoaderPOSIXDYLD::Performed TLS lookup: "
+             "module=%s, link_map=0x%" PRIx64 ", tp=0x%" PRIx64
+             ", modid=%" PRId64 ", tls_block=0x%" PRIx64 "\n",
+             module_sp->GetObjectName().AsCString(""), link_map, tp,
+             (int64_t)modid, tls_block);
 
-  if (tls_block == LLDB_INVALID_ADDRESS)
-    return LLDB_INVALID_ADDRESS;
-  else
-    return tls_block + tls_file_addr;
+   if (tls_block == LLDB_INVALID_ADDRESS)
+     return LLDB_INVALID_ADDRESS;
+   else
+     return tls_block + tls_file_addr;
 }
 
 void DynamicLoaderPOSIXDYLD::ResolveExecutableModule(
