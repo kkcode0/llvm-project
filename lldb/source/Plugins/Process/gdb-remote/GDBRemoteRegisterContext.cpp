@@ -85,7 +85,7 @@ uint64_t GDBRemoteRegisterContext::GetThreadPointer() {
   Process *process = exe_ctx.GetProcessPtr();
   Thread *thread = exe_ctx.GetThreadPtr();
   if (process == nullptr || thread == nullptr)
-    return -1;
+    return LLDB_INVALID_ADDRESS;
   GDBRemoteCommunicationClient &gdb_comm(
       ((ProcessGDBRemote *)process)->GetGDBRemote());
   uint64_t tid = thread->GetProtocolID();

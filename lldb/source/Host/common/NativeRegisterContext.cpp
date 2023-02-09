@@ -121,7 +121,7 @@ const char *NativeRegisterContext::GetRegisterSetNameForRegisterAtIndex(
 }
 
 Status NativeRegisterContext::ReadThreadPointer(uint64_t& tp) {
-  tp = -1;
+  tp = LLDB_INVALID_ADDRESS;
   Status error;
   return error;
 }
