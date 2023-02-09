@@ -23,7 +23,6 @@ public:
 
   ~RegisterContextPOSIX_riscv64() override;
 
-  
   void invalidate();
 
   void InvalidateAllRegisters() override;

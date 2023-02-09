@@ -179,6 +179,7 @@ void DynamicLoaderPOSIXDYLD::DidLaunch() {
     ModuleList module_list;
     module_list.Append(executable);
     UpdateLoadedSections(executable, LLDB_INVALID_ADDRESS, load_offset, true);
+
     LLDB_LOGF(log, "DynamicLoaderPOSIXDYLD::%s about to call ProbeEntry()",
               __FUNCTION__);
     ProbeEntry();
@@ -191,10 +192,7 @@ Status DynamicLoaderPOSIXDYLD::CanLoadImage() { return Status(); }
 void DynamicLoaderPOSIXDYLD::UpdateLoadedSections(ModuleSP module,
                                                   addr_t link_map_addr,
                                                   addr_t base_addr,
-                                                  bool base_addr_is_offset) {
-  Log *log = GetLog(LLDBLog::DynamicLoader);
-
-  LLDB_LOGF(log, "DYLD::UpdateLoadedSections link_map_addr:%" PRIx64,  link_map_addr);                 
+                                                  bool base_addr_is_offset) {             
   m_loaded_modules[module] = link_map_addr;
   UpdateLoadedSectionsCommon(module, base_addr, base_addr_is_offset);
 }

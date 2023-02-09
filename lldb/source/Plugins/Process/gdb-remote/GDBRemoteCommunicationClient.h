@@ -445,9 +445,11 @@ public:
   /// executable. If successful, the returned structure will contain at least
   /// one value in the offsets field.
   llvm::Optional<QOffsets> GetQOffsets();
+  
   bool GetQGetTLSAddr(lldb::tid_t tid, lldb::addr_t offset, lldb::addr_t lms);
 
-lldb::addr_t GetQGetTLSAddr(lldb::tid_t tid);
+  lldb::addr_t GetQGetTLSAddr(lldb::tid_t tid);
+  
   bool GetModuleInfo(const FileSpec &module_file_spec,
                      const ArchSpec &arch_spec, ModuleSpec &module_spec);
 

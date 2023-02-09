@@ -26,7 +26,7 @@ public:
                        uint32_t address_byte_size);
 
   ~RegisterContextDummy() override;
-  
+
   void InvalidateAllRegisters() override;
 
   size_t GetRegisterCount() override;
