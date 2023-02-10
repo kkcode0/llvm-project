@@ -1497,10 +1497,6 @@ bool ProcessGDBRemote::DoUpdateThreadList(ThreadList &old_thread_list,
     num_thread_ids = m_thread_ids.size();
   }
 
-  for(auto& tid: m_thread_ids) {
-    (void)m_gdb_comm.GetQGetTLSAddr(tid, 0, 0);
-  }
-
   ThreadList old_thread_list_copy(old_thread_list);
   if (num_thread_ids > 0) {
     for (size_t i = 0; i < num_thread_ids; ++i) {

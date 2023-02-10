@@ -2121,14 +2121,16 @@ GDBRemoteCommunicationServerLLGS::Handle_qGetTLSAddr(
     return SendErrorResponse(8);
   llvm::SmallVector<llvm::StringRef, 16> argv;
   s.split(argv, ',');
-  lldb::tid_t tid =  StringExtractor(argv[0]).GetU64(0, 16);
-  NativeThreadProtocol* ntp= m_current_process->GetThreadByID(tid);
+  lldb::tid_t tid =  StringExtractor(argv[0]).GetU64(LLDB_INVALID_ADDRESS, 16);
+  lldb::addr_t offset = StringExtractor(argv[1]).GetU64(LLDB_INVALID_ADDRESS, 16);
+  lldb::addr_t lm = StringExtractor(argv[2]).GetU64(LLDB_INVALID_ADDRESS, 16);
+  NativeThreadProtocol *ntp = m_current_process->GetThreadByID(tid);
   NativeRegisterContext &reg_ctx = ntp->GetRegisterContext();
   lldb::addr_t tls_addr = LLDB_INVALID_ADDRESS;
   StreamGDBRemote response;
   if(!reg_ctx.ReadThreadPointer(tls_addr).Fail()) {
     response.PutHex64(tls_addr, lldb::eByteOrderBig);
-  return SendPacketNoLock(response.GetString());
+    return SendPacketNoLock(response.GetString());
   } else
     return SendErrorResponse(8);
 }

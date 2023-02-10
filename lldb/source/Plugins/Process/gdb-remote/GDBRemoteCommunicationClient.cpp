@@ -3759,14 +3759,7 @@ llvm::Optional<QOffsets> GDBRemoteCommunicationClient::GetQOffsets() {
   return std::nullopt;
 }
 
-std::unordered_map<lldb::tid_t, lldb::addr_t> tid_to_tp;
-lldb::addr_t GDBRemoteCommunicationClient::GetQGetTLSAddr(lldb::tid_t tid) {
-  if (tid_to_tp.count(tid))
-    return tid_to_tp[tid];
-  return -1;
-}
-
-bool GDBRemoteCommunicationClient::GetQGetTLSAddr(lldb::tid_t tid, lldb::addr_t offset, lldb::addr_t lm) {
+lldb::addr_t GDBRemoteCommunicationClient::GetQGetTLSAddr(lldb::tid_t tid, lldb::addr_t offset, lldb::addr_t lm) {
   StreamString packet;
   packet.PutCString("qGetTLSAddr:");
   packet.PutHex64(tid, lldb::eByteOrderBig);
@@ -3777,18 +3770,15 @@ bool GDBRemoteCommunicationClient::GetQGetTLSAddr(lldb::tid_t tid, lldb::addr_t 
   StringExtractorGDBRemote response;
   if (SendPacketAndWaitForResponse(packet.GetString(), response) !=
       PacketResult::Success)
-    return false;
+    return LLDB_INVALID_ADDRESS;
   if (response.IsErrorResponse())
-    return false;
+    return LLDB_INVALID_ADDRESS;
   if (response.IsUnsupportedResponse())
-    return false;
-   llvm::StringRef ref = response.GetStringRef();
-   uint64_t addr=-1;
-   ref.consumeInteger(16, addr);
-    Log *log(GetLog(GDBRLog::Process | GDBRLog::Packets));
-    LLDB_LOG(log, "here is tls addrkamlesh:%s",ref.str().c_str());
-   tid_to_tp[tid] = addr;// std::stoull(ref.str());
-  return true;
+    return LLDB_INVALID_ADDRESS;
+  llvm::StringRef ref = response.GetStringRef();
+  uint64_t addr = LLDB_INVALID_ADDRESS;
+  ref.consumeInteger(16, addr);
+  return addr;
 }
 
 bool GDBRemoteCommunicationClient::GetModuleInfo(

@@ -1647,7 +1647,6 @@ void Thread::SettingsInitialize() {}
 void Thread::SettingsTerminate() {}
 
 lldb::addr_t Thread::GetThreadPointer() {
-  auto tid = this->GetProtocolID();
   RegisterContext *reg_ctx = this->GetRegisterContext().get();
   auto tp = reg_ctx->GetThreadPointer();
   return tp;

@@ -89,7 +89,8 @@ uint64_t GDBRemoteRegisterContext::GetThreadPointer() {
   GDBRemoteCommunicationClient &gdb_comm(
       ((ProcessGDBRemote *)process)->GetGDBRemote());
   uint64_t tid = thread->GetProtocolID();
-  return gdb_comm.GetQGetTLSAddr(tid);
+  // Return thread pointer here, offset and link_map will be filled by GetThreadLocalData in DYLD
+  return gdb_comm.GetQGetTLSAddr(tid, LLDB_INVALID_ADDRESS /* offset */, LLDB_INVALID_ADDRESS /* lm */);
 }
 
 bool GDBRemoteRegisterContext::ReadRegister(const RegisterInfo *reg_info,
